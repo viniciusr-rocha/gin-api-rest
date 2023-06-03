@@ -45,7 +45,12 @@ func responseNotfound(c *gin.Context) {
 
 func InsertStudent(c *gin.Context) {
 	var student models.Student
+
 	if err := c.ShouldBindJSON(&student); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := models.ValidateStudent(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -59,6 +64,11 @@ func UpdateStudent(c *gin.Context) {
 	database.DB.First(&student, id)
 
 	if err := c.ShouldBindJSON(&student); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := models.ValidateStudent(&student); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
